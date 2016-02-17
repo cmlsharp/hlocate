@@ -1,16 +1,16 @@
 module WalkDir (walkDir) where
 
 import Data.List (partition)
-import Data.Tree (Tree (Node))
 import System.Directory (getDirectoryContents)
 import System.FilePath ((</>))
 import System.Posix.Files (isDirectory, getSymbolicLinkStatus)
 
-walkDir :: FilePath -> IO (Tree [FilePath])
+import DTree (DTree(Node))
+
+walkDir :: FilePath -> IO (DTree FilePath)
 walkDir r = do
     (files, dirs) <- fmap (r </>) . exceptLocal <$> getDirectoryContents r >>= filesAndDirs
-    dirs' <- traverse walkDir dirs
-    return $ Node files dirs'
+    Node r files <$> traverse walkDir dirs 
 
 tagDirectories :: [FilePath] -> IO [(FilePath, Bool)]
 tagDirectories = traverse (fmap <$> (,) <*> isDir)
