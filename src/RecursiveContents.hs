@@ -17,7 +17,7 @@ tagDirectories = traverse (fmap <$> (,) <*> isDir)
     where isDir = fmap isDirectory . getSymbolicLinkStatus
 
 filesAndDirs :: [FilePath] -> IO ([FilePath], [FilePath])
-filesAndDirs c = bimap (fmap fst) . partition (not . snd) <$> tagDirectories c
+filesAndDirs = fmap (bimap (map fst) . partition (not . snd)) . tagDirectories
     where bimap f (a,b) = (f a, f b)
 
 exceptLocal :: [FilePath] -> [FilePath]

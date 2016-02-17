@@ -1,17 +1,15 @@
 module RTree where
 
-import qualified Data.Traversable as T
+import Data.Traversable (fmapDefault, foldMapDefault)
 
-data RTree a = a :> [RTree a]
-
-instance Show a => Show (RTree a) where
-    show (a :> as) = show a ++ show as
+data RTree a = a :> [RTree a] deriving Show
 
 instance Functor RTree where
-    fmap = T.fmapDefault
+    fmap = fmapDefault
+
+instance Foldable RTree where
+    foldMap = foldMapDefault
 
 instance Traversable RTree where
     traverse f (x:>xs) = (:>) <$> f x <*> traverse (traverse f) xs
 
-instance Foldable RTree where
-    foldMap = T.foldMapDefault
