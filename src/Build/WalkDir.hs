@@ -1,15 +1,18 @@
-module WalkDir {-(walkDir)-} where
+{-# LANGUAGE LambdaCase #-}
+module Build.WalkDir (walkDir) where
 
+import Build.DTree (DTree(..))
+
+import Control.Exception (try, displayException, IOException)
 import Data.List (partition)
 import System.Directory (getDirectoryContents)
 import System.FilePath ((</>))
 import System.Posix.Files (isDirectory, getSymbolicLinkStatus)
 
-import DTree (DTree(Node))
-
 walkDir :: FilePath -> IO (DTree FilePath)
-walkDir r = formatContents r >>= filesAndDirs >>= uncurry (buildNode r)
-    where buildNode r f d  = Node r f <$> traverse walkDir d
+walkDir r = try (formatContents r >>= filesAndDirs) >>=
+    \case Left e      -> return $ Fail r (displayException (e :: IOException)) 
+          Right (f,d) -> Node r f <$> (traverse walkDir d)
 
 formatContents :: FilePath -> IO [FilePath]
 formatContents d = fmap (d </>) . exceptLocal <$> getDirectoryContents d
