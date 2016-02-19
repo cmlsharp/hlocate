@@ -1,6 +1,6 @@
 {-# LANGUAGE LambdaCase #-}
 
-module Build.WalkDir (walkDir, walkDirPrune) where
+module Build.WalkDir where
 
 import Build.DTree (DTree(..))
 
@@ -15,11 +15,11 @@ walkDir = walkDirPrune (const True)
 
 walkDirPrune :: (FilePath -> Bool) -> FilePath -> IO (DTree FilePath)
 walkDirPrune f r = try (formatContents f r >>= filesAndDirs) >>=
-    \case Left e      -> return $ Fail r (displayException (e :: IOException)) 
-          Right (f,d) -> Node r f <$> (traverse walkDir d)
+    \case Left e       -> return $ Fail r (displayException (e :: IOException)) 
+          Right (fi,d) -> Node r fi <$> (traverse (walkDirPrune f) d)
 
 formatContents :: (FilePath -> Bool) -> FilePath -> IO [FilePath]
-formatContents f d = filter f . fmap (d </>) . exceptLocal <$> getDirectoryContents d
+formatContents f d = filter (not .f) . fmap (d </>) . exceptLocal <$> getDirectoryContents d
     where exceptLocal = filter ((&&) <$> (/=) "." <*> (/=) "..")
 
 tagDirectories :: [FilePath] -> IO [(FilePath, Bool)]
