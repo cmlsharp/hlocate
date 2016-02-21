@@ -1,8 +1,12 @@
 {-# LANGUAGE LambdaCase #-}
 
-module Build.WalkDir where
+module HLocate.WalkDir
+    ( walkDir
+    , walkDirPrune
+    , DirTree (..)
+    ) where
 
-import Build.DTree (DTree(..))
+import HLocate.DirTree (DirTree(..))
 
 import Control.Exception (try, displayException, IOException)
 import Data.List (partition)
@@ -10,10 +14,10 @@ import System.Directory (getDirectoryContents)
 import System.FilePath ((</>))
 import System.Posix.Files (isDirectory, getSymbolicLinkStatus)
 
-walkDir :: FilePath -> IO (DTree FilePath)
-walkDir = walkDirPrune (const True)
+walkDir :: FilePath -> IO (DirTree FilePath)
+walkDir = walkDirPrune (const False)
 
-walkDirPrune :: (FilePath -> Bool) -> FilePath -> IO (DTree FilePath)
+walkDirPrune :: (FilePath -> Bool) -> FilePath -> IO (DirTree FilePath)
 walkDirPrune f r = try (formatContents f r >>= filesAndDirs) >>=
     \case Left e       -> return $ Fail r (displayException (e :: IOException)) 
           Right (fi,d) -> Node r fi <$> (traverse (walkDirPrune f) d)
