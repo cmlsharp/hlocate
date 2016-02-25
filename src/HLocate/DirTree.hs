@@ -3,7 +3,7 @@
 module HLocate.DirTree (DirTree (..)) where
 
 import Control.Exception (IOException)
-import Data.Binary (Binary)
+import Pipes.Binary (Binary)
 import Data.Traversable (foldMapDefault, fmapDefault)
 import GHC.Generics (Generic)
 
@@ -13,7 +13,7 @@ data DirTree a = Node { name  :: a
                       } 
                | Fail { name :: a
                       , msg :: String
-                      } deriving (Generic, Show)
+                      } deriving (Generic)
 
 
 instance Binary a => Binary (DirTree a)
