@@ -3,8 +3,7 @@ module HLocate.Options (Opts (..), parseOpts) where
 import Options.Applicative
 
 data Opts = Opts 
-    { update   :: Bool
-    , location :: String
+    { location :: String
     , queries  :: [String]
     }
 
@@ -14,11 +13,7 @@ parseOpts = execParser infoOpts
 
 opts :: Parser Opts
 opts = Opts 
-    <$> switch
-        ( long  "update"
-       <> short 'u'
-       <> help "Update database" )
-    <*> strOption
+    <$> strOption
         ( long "database"
        <> short 'd'
        <> metavar "DBPATH"

@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveGeneric #-}
 
-module HLocate.File where
+module Shared.File where
 
 import Pipes.Binary (Binary)
 import GHC.Generics (Generic)

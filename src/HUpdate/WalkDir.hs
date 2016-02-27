@@ -1,8 +1,8 @@
 {-# LANGUAGE LambdaCase #-}
 
-module HLocate.WalkDir (walkDir, walkDirPrune) where
+module HUpdate.WalkDir (walkDir, walkDirPrune) where
 
-import HLocate.File (File (..))
+import Shared.File (File (..))
 
 import Control.Monad (when)
 import Control.Exception (try, IOException)
