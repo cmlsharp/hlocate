@@ -1,7 +1,8 @@
 module HUpdate.Config (Cfg, readConfig) where
 
-import Data.Maybe
-import Data.Char
+import Control.Monad (liftM2)
+import Data.Maybe (catMaybes)
+import Data.Char (isSpace)
 import Text.ParserCombinators.Parsec
 
 import qualified Data.Map.Strict as M
@@ -9,20 +10,13 @@ import qualified Data.Map.Strict as M
 type Cfg = M.Map String String
 
 ident :: Parser String
-ident = do c <- letter <|> char '_'
-           cs <- many (letter <|> digit <|> char '_')
-           return (c:cs)
-        <?> "identifier"
+ident = liftM2 (:) (letter <|> char '_') (many (letter <|> digit <|> char '_')) <?> "identifier"
 
 comment :: Parser ()
-comment = do char '#'
-             skipMany (noneOf "\r\n")
-          <?> "comment"
+comment = char '#' >> skipMany (noneOf "\r\n") <?> "comment"
 
 eol :: Parser ()
-eol = do oneOf "\n\r"
-         return ()
-      <?> "end of line"
+eol = oneOf "\n\r" >> return () <?> "end of line"
 
 item :: Parser (String, String)
 item = do key <- ident
@@ -33,14 +27,11 @@ item = do key <- ident
           return (key, reverse . dropWhile isSpace . reverse $ value)
 
 line :: Parser (Maybe (String, String))
-line = do skipMany space
-          try (comment >> return Nothing) <|> (item >>= return . Just)
+line = skipMany space >> (try (comment >> return Nothing) <|> (item >>= return . Just))
 
 file :: Parser [(String, String)]
-file = do lines <- many line
-          return (catMaybes lines)
+file = many line >>= return . catMaybes
 
 readConfig :: SourceName -> IO (Either ParseError Cfg)
-readConfig name = 
-    parseFromFile file name >>=
-        return . fmap (foldr (uncurry M.insert) M.empty . reverse)
+readConfig name = parseFromFile file name >>= 
+    return . fmap (foldr (uncurry M.insert) M.empty . reverse)
