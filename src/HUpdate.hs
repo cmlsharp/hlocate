@@ -4,15 +4,14 @@ module Main where
 
 import HUpdate.Options
 import HUpdate.WalkDir (walkDirPrune)
-import HUpdate.Config (Cfg, readConfig)
+import HUpdate.Config (readConfig)
 
 import Data.List (isInfixOf)
 import Data.Maybe (catMaybes)
 import Pipes
 import Pipes.Binary (encode)
 import System.IO
-import System.MountPoints
-import Text.ParserCombinators.Parsec.Error (messageString, errorMessages)
+import System.MountPoints (getMounts, Mntent (..))
 
 import qualified Data.Map.Strict  as M
 import qualified Pipes.ByteString as PB
@@ -29,8 +28,8 @@ getPrunes fi =  readConfig fi >>=
                           let fs   = [return . mkPrune isInfixOf, return . mkPrune (==), isFs]
                           fs <- sequenceA . catMaybes $ zipWith fmap fs vars
                           return (\x -> any ($ x) fs)
-          Left  err -> hPutStrLn stderr "WARNING: Configuration file parsing failed with the following error(s). Continuing without pruning\n" >>
-                       hPutStrLn stderr (unlines . map messageString . errorMessages $ err) >> 
+          Left  err -> hPrint stderr err >>
+                       hPutStrLn stderr "\nContinuing without pruning..." >>
                        return (const False)
 
 isFs :: [String] -> IO (FilePath -> Bool)
