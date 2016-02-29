@@ -19,7 +19,7 @@ import qualified Pipes.ByteString as PB
 main = putStrLn "Indexing..." >> parseOpts >>= updateDB <$> output <*> dbRoot <*> cfgFile
 
 updateDB :: FilePath -> FilePath -> FilePath -> IO ()
-updateDB out root cfg = getPrunes cfg >>= (\f -> withFile out WriteMode $ encodeFiles f)
+updateDB out root cfg = getPrunes cfg >>= withFile out WriteMode . encodeFiles
     where encodeFiles f h = runEffect $ for (walkDirPrune f root) encode >-> PB.toHandle h
 
 getPrunes :: FilePath -> IO (FilePath -> Bool)
