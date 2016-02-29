@@ -5,6 +5,7 @@ import Options.Applicative
 data Opts = Opts 
     { output     :: FilePath
     , dbRoot     :: FilePath
+    , cfgFile    :: FilePath
     }
 
 parseOpts :: IO Opts
@@ -14,8 +15,8 @@ parseOpts = execParser infoOpts
 opts :: Parser Opts
 opts = Opts 
     <$> strOption
-        ( long "database"
-       <> short 'd'
+        ( long "output"
+       <> short 'o'
        <> metavar "FILE"
        <> help "Write the database to FILE instead of using the default database."
        <> value "/etc/hlocate.db" )
@@ -25,3 +26,9 @@ opts = Opts
        <> metavar "PATH"
        <> help "Store only the results of scanning the file system subtree rooted at PATH to the generated database. The whole filesystem is scanned by default"
        <> value "/" )
+    <*> strOption
+        ( long "config-file"
+       <> short 'C'
+       <> metavar "FILE"
+       <> help "Specify configuration file to read from (/etc/hlocate.conf by default)"
+       <> value "/etc/hlocate.conf" )
