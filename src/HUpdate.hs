@@ -2,10 +2,11 @@
 
 module Main where
 
-import HUpdate.Options
+import HUpdate.Options (parseOpts, Opts (..))
 import HUpdate.WalkDir (walkDirPrune)
 import HUpdate.Config (readConfig)
 
+import Control.Monad.Trans.Reader (runReaderT, asks, ReaderT)
 import Data.List (isInfixOf)
 import Data.Maybe (catMaybes)
 import Pipes
@@ -16,11 +17,13 @@ import System.MountPoints (getMounts, Mntent (..))
 import qualified Data.Map.Strict  as M
 import qualified Pipes.ByteString as PB
 
-main = putStrLn "Indexing..." >> parseOpts >>= updateDB <$> output <*> dbRoot <*> cfgFile
+main = putStrLn "Indexing..." >> parseOpts >>= runReaderT updateDB
 
-updateDB :: FilePath -> FilePath -> FilePath -> IO ()
-updateDB out root cfg = getPrunes cfg >>= withFile out WriteMode . encodeFiles
-    where encodeFiles f h = runEffect $ for (walkDirPrune f root) encode >-> PB.toHandle h
+updateDB :: ReaderT Opts IO ()
+updateDB = do out <- asks output 
+              fs <- asks cfgFile >>= liftIO . getPrunes 
+              asks dbRoot >>= liftIO . withFile out WriteMode . encodeFiles fs
+    where encodeFiles f r h = runEffect $ for (walkDirPrune f r) encode >-> PB.toHandle h
 
 getPrunes :: FilePath -> IO (FilePath -> Bool)
 getPrunes fi =  readConfig fi >>= 

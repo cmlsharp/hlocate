@@ -4,6 +4,7 @@ import Options.Applicative
 
 data Opts = Opts 
     { location :: String
+    , testFunc :: [Bool] -> Bool
     , queries  :: [String]
     }
 
@@ -19,4 +20,8 @@ opts = Opts
        <> metavar "DBPATH"
        <> help "Specify an alternative DBPATH"
        <> value "/etc/hlocate.db" )
+    <*> flag or and
+        ( long "all"
+       <> short 'A'
+       <> help "Print only entries that match all QUERIES instead of requiring only one of them to match")
     <*> some (argument str (metavar "QUERIES..."))

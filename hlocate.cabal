@@ -23,21 +23,23 @@ executable hlocate
                       , pipes
                       , pipes-binary
                       , pipes-bytestring
+                      , transformers
   hs-source-dirs:     src
   default-language:   Haskell2010
 
 executable hupdate
   main-is:            HUpdate.hs
   build-depends:      base >=4.8 && <4.9
-                      , unix
-                      , filepath
+                      , containers
                       , directory
+                      , filepath
+                      , mountpoints
                       , optparse-applicative
+                      , parsec
                       , pipes
                       , pipes-binary
                       , pipes-bytestring
-                      , parsec
-                      , containers
-                      , mountpoints
+                      , transformers
+                      , unix
   hs-source-dirs:     src
   default-language:   Haskell2010
