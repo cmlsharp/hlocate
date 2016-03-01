@@ -7,6 +7,7 @@ Somewhat useable
 #### Done:
 * Relatively performant querying (somewhat slower than mlocate)
 * Serialization of data structure (database is roughly 2/3 the size of mlocate's on my system)
+* Only search by basename
 * Basic option parsing 
 * Config file parsing
 * Pruning

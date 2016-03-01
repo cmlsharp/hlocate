@@ -17,12 +17,12 @@ main = parseOpts >>= runReaderT queryDB
 
 queryDB :: ReaderT Opts IO ()
 queryDB = do loc <- asks location
-             tf  <- asks testFunc
-             qs  <- map isInfixOf <$> asks queries
+             ao  <- asks andOr
+             qs  <- asks testFunc >>= (\f -> map f <$> asks queries)
              liftIO . withFile loc ReadMode $ \h -> runEffect $ 
                  for (decoder (PB.fromHandle h) 
                      >-> reconstruct 
-                     >-> P.filter (\x -> tf (($ x) <$> qs)))
+                     >-> P.filter (\x -> ao (($ x) <$> qs)))
                  (lift . putStrLn)
 
 

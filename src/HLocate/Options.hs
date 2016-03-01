@@ -1,10 +1,13 @@
 module HLocate.Options (Opts (..), parseOpts) where
 
 import Options.Applicative
+import Data.List (isInfixOf)
+import System.FilePath (takeBaseName)
 
 data Opts = Opts 
     { location :: String
-    , testFunc :: [Bool] -> Bool
+    , andOr    :: [Bool] -> Bool
+    , testFunc :: FilePath -> FilePath -> Bool
     , queries  :: [String]
     }
 
@@ -23,5 +26,9 @@ opts = Opts
     <*> flag or and
         ( long "all"
        <> short 'A'
-       <> help "Print only entries that match all QUERIES instead of requiring only one of them to match")
+       <> help "Print only entries that match all QUERIES instead of requiring only one of them to match" )
+    <*> flag isInfixOf (\x y -> isInfixOf x $ takeBaseName y)
+        ( long "basename"
+       <> short 'b'
+       <> help "Match only the base name against the specified patterns." )
     <*> some (argument str (metavar "QUERIES..."))
