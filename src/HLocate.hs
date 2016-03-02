@@ -19,11 +19,12 @@ queryDB :: ReaderT Opts IO ()
 queryDB = do loc <- asks location
              ao  <- asks andOr
              qs  <- asks testFunc >>= (\f -> map f <$> asks queries)
+             ec  <- asks endChar
              liftIO . withFile loc ReadMode $ \h -> runEffect $ 
                  for (decoder (PB.fromHandle h) 
                      >-> reconstruct 
                      >-> P.filter (\x -> ao (($ x) <$> qs)))
-                 (lift . putStrLn)
+                 (lift . (\x -> putStr x >> putStr [ec]))
 
 
 -- Convert stream of bytes into stream of decoded values, skipping errors

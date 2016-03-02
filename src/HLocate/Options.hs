@@ -8,6 +8,7 @@ data Opts = Opts
     { location :: String
     , andOr    :: [Bool] -> Bool
     , testFunc :: FilePath -> FilePath -> Bool
+    , endChar  :: Char
     , queries  :: [String]
     }
 
@@ -31,4 +32,8 @@ opts = Opts
         ( long "basename"
        <> short 'b'
        <> help "Match only the base name against the specified patterns." )
+    <*> flag '\n' '\0'
+        ( long "null"
+       <> short '0'
+       <> help "Separate entries with NULL on output" )
     <*> some (argument str (metavar "QUERIES..."))
