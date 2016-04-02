@@ -3,9 +3,9 @@ module HUpdate.Options (Opts (..), parseOpts) where
 import Options.Applicative
 
 data Opts = Opts 
-    { output     :: FilePath
-    , dbRoot     :: FilePath
-    , cfgFile    :: FilePath
+    { output     :: FilePath -- Where HUpdate should put the database
+    , dbRoot     :: FilePath -- Where to start indexing
+    , cfgFile    :: FilePath -- Config file to read
     }
 
 parseOpts :: IO Opts

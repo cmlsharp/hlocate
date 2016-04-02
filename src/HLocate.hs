@@ -13,6 +13,7 @@ import System.IO (withFile, IOMode (..), Handle)
 import qualified Pipes.ByteString as PB
 import qualified Pipes.Prelude    as P
 
+main :: IO ()
 main = parseOpts >>= runReaderT queryDB
 
 queryDB :: ReaderT Opts IO ()
