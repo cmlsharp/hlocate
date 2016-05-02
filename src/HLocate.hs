@@ -3,9 +3,9 @@ module Main where
 import HLocate.Options (Opts (..), parseOpts)
 import Shared.File (File (..))
 
+import Control.Monad (liftM2)
 import Control.Monad.Trans.Reader (ReaderT, asks, runReaderT)
 import Control.Lens (view)
-import Data.List (isInfixOf)
 import Pipes
 import Pipes.Binary (decoded)
 import System.IO (withFile, IOMode (..), Handle)
@@ -19,14 +19,13 @@ main = parseOpts >>= runReaderT queryDB
 queryDB :: ReaderT Opts IO ()
 queryDB = do loc <- asks location
              ao  <- asks andOr
-             qs  <- asks testFunc >>= (\f -> map f <$> asks queries)
+             qs  <- liftM2 (.) (asks matchFunc) (asks baseName)  >>= (\f -> map f <$> asks queries)
              ec  <- asks endChar
              liftIO . withFile loc ReadMode $ \h -> runEffect $ 
                  for (decoder (PB.fromHandle h) 
                      >-> reconstruct 
                      >-> P.filter (\x -> ao (($ x) <$> qs)))
-                 (lift . (\x -> putStr x >> putStr [ec]))
-
+                 (lift . (\x -> putStr x >> putChar ec))
 
 -- Convert stream of bytes into stream of decoded values, skipping errors
 decoder :: Producer PB.ByteString IO () -> Producer File IO ()

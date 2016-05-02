@@ -21,6 +21,7 @@ executable hlocate
                       , filepath
                       , optparse-applicative
                       , lens
+                      , regex-pcre
                       , pipes
                       , pipes-binary
                       , pipes-bytestring

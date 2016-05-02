@@ -23,8 +23,8 @@ main = putStrLn "Indexing..." >> parseOpts >>= runReaderT updateDB
 -- Index directory and encode to output file
 updateDB :: ReaderT Opts IO ()
 updateDB = do out <- asks output 
-              fs <- asks cfgFile >>= liftIO . getPrunes 
-              asks dbRoot >>= liftIO . withFile out WriteMode . encodeFiles fs
+              f <- asks cfgFile >>= liftIO . getPrunes 
+              asks dbRoot >>= liftIO . withFile out WriteMode . encodeFiles f
     where encodeFiles f r h = runEffect $ for (walkDirPrune f r) encode >-> PB.toHandle h
 
 -- Take config file location and return single pruning function
