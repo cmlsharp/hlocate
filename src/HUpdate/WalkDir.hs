@@ -4,7 +4,8 @@ module HUpdate.WalkDir (walkDir, walkDirPrune) where
 
 import Shared.File (File (..))
 
-import Control.Monad (when)
+import Control.Monad (when, join)
+import Control.Arrow ((***), (&&&))
 import Control.Exception (try, IOException)
 import Data.List (partition)
 import Pipes
@@ -46,10 +47,9 @@ formatContents f d = filter (not .f) . fmap (d </>) . exceptLocal <$> getDirecto
 
 -- Tag each file path as a file or directory (True for directories, False for files)
 tagDirectories :: [FilePath] -> IO [(FilePath, Bool)]
-tagDirectories = traverse (fmap <$> (,) <*> isDir)
+tagDirectories = traverse $ sequenceA . (id &&& isDir)
     where isDir = fmap isDirectory .  getSymbolicLinkStatus
 
 -- Seperate a list file paths into ([Files], [Directories])
 filesAndDirs :: [FilePath] -> IO FilesDirs
-filesAndDirs = fmap (bimap (map fst) . partition (not . snd)) . tagDirectories
-    where bimap f (a,b) = (f a, f b)
+filesAndDirs = fmap (join (***) (map fst) . partition (not . snd)) . tagDirectories

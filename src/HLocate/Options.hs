@@ -1,5 +1,6 @@
 module HLocate.Options (Opts (..), parseOpts) where
 
+import Data.Monoid ((<>))
 import Options.Applicative
 import Data.List (isInfixOf)
 import System.FilePath (takeBaseName)

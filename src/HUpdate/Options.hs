@@ -1,6 +1,7 @@
 module HUpdate.Options (Opts (..), parseOpts) where
 
 import Options.Applicative
+import Data.Monoid ((<>))
 
 data Opts = Opts 
     { output     :: FilePath -- Where HUpdate should put the database
