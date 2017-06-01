@@ -1,4 +1,4 @@
-##hlocate
+## hlocate
 
 An attempt at implementing the locate utility in Haskell.
 
