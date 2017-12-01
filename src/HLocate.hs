@@ -29,7 +29,7 @@ queryDB = do loc <- asks location
 
 -- Convert stream of bytes into stream of decoded values, skipping errors
 decoder :: Producer PB.ByteString IO () -> Producer File IO ()
-decoder p = void (view decoded p)
+decoder = void . view decoded
 
 -- Convert File back into full filepath
 reconstruct :: Pipe File FilePath IO ()
